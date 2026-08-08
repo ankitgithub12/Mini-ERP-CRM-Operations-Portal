@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '../services/authService';
+import { ROLE_PERMISSIONS } from '../utils/constants';
 
 const AuthContext = createContext(null);
 
@@ -40,7 +41,6 @@ export const AuthProvider = ({ children }) => {
 
   const hasPermission = (module, action) => {
     if (!user) return false;
-    const { ROLE_PERMISSIONS } = require('../utils/constants');
     const perms = ROLE_PERMISSIONS[user.role];
     if (!perms) return false;
 
