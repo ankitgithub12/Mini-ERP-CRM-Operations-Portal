@@ -14,9 +14,17 @@ const ProductForm = () => {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm({
     defaultValues: { current_stock: 0, minimum_stock: 0 },
   });
+
+  const handleGenerateSKU = () => {
+    const timestamp = Date.now().toString().slice(-6);
+    const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const autoSKU = `PROD-${timestamp}-${randomStr}`;
+    setValue('sku', autoSKU, { shouldValidate: true });
+    toast.success('SKU code generated');
+  };
 
   useEffect(() => {
     if (isEdit) {
@@ -69,7 +77,16 @@ const ProductForm = () => {
             </div>
             <div>
               <label className="label">SKU *</label>
-              <input {...register('sku', { required: 'SKU is required' })} className={`input-field ${errors.sku ? 'input-error' : ''}`} placeholder="e.g. PROD-001" />
+              <div className="flex gap-2">
+                <input {...register('sku', { required: 'SKU is required' })} className={`input-field ${errors.sku ? 'input-error' : ''}`} placeholder="e.g. PROD-001" />
+                <button
+                  type="button"
+                  onClick={handleGenerateSKU}
+                  className="btn-secondary whitespace-nowrap"
+                >
+                  Generate SKU
+                </button>
+              </div>
               {errors.sku && <p className="mt-1 text-xs text-red-600">{errors.sku.message}</p>}
             </div>
             <div>
