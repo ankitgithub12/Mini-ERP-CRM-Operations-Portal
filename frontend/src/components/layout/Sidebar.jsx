@@ -10,6 +10,7 @@ import {
   UserCog,
   X,
   Box,
+  Settings as SettingsIcon,
 } from 'lucide-react';
 
 const navItems = [
@@ -58,6 +59,13 @@ const navItems = [
     path: '/users',
     icon: UserCog,
     roles: ['Admin'],
+  },
+  { type: 'divider', label: 'System', roles: ['Admin', 'Sales', 'Warehouse', 'Accounts'] },
+  {
+    label: 'Settings',
+    path: '/settings',
+    icon: SettingsIcon,
+    roles: ['Admin', 'Sales', 'Warehouse', 'Accounts'],
   },
 ];
 

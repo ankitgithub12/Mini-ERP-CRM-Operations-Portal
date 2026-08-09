@@ -17,6 +17,7 @@ import ChallanList from './pages/challans/ChallanList';
 import ChallanForm from './pages/challans/ChallanForm';
 import ChallanDetail from './pages/challans/ChallanDetail';
 import UserList from './pages/users/UserList';
+import Settings from './pages/Settings';
 
 function App() {
   return (
@@ -84,6 +85,9 @@ function App() {
             <Route path="/users" element={
               <ProtectedRoute roles={['Admin']}><UserList /></ProtectedRoute>
             } />
+
+            {/* Settings - All roles */}
+            <Route path="/settings" element={<Settings />} />
           </Route>
 
           {/* Catch all */}
