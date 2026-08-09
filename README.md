@@ -161,6 +161,10 @@ npm run dev     # Starts on http://localhost:5173
 | `SUPABASE_URL` | Supabase project URL | `https://xxx.supabase.co` |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key | `eyJhbGci...` |
 | `CLIENT_URL` | Frontend URL for CORS | `http://localhost:5173` |
+| `AWS_ACCESS_KEY_ID` | AWS access key for S3 uploads (Optional) | `AKIA2UZY...` |
+| `AWS_SECRET_ACCESS_KEY` | AWS secret key for S3 uploads (Optional) | `iwXNjlQS...` |
+| `AWS_REGION` | AWS region hosting the S3 bucket (Optional) | `us-east-1` |
+| `AWS_BUCKET_NAME` | AWS S3 bucket name for product images (Optional) | `my-erp-uploads` |
 
 ### Frontend `.env`
 | Variable | Description | Example |
