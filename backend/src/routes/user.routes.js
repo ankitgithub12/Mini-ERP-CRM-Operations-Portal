@@ -12,4 +12,10 @@ router.get('/', authorizeRoles('Admin'), userController.getUsers);
 // POST /api/users — Admin only
 router.post('/', authorizeRoles('Admin'), userController.createUser);
 
+// PUT /api/users/:id — Admin only
+router.put('/:id', authorizeRoles('Admin'), userController.updateUser);
+
+// DELETE /api/users/:id — Admin only
+router.delete('/:id', authorizeRoles('Admin'), userController.deleteUser);
+
 module.exports = router;
