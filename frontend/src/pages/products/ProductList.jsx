@@ -90,7 +90,18 @@ const ProductList = () => {
                 <tbody>
                   {products.map((p) => (
                     <tr key={p.id}>
-                      <td><p className="font-medium text-gray-900">{p.product_name}</p></td>
+                      <td>
+                        <div className="flex items-center gap-3">
+                          {p.image_url ? (
+                            <img src={p.image_url} alt={p.product_name} className="w-10 h-10 object-cover rounded-lg border border-gray-200 bg-gray-50 flex-shrink-0" />
+                          ) : (
+                            <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center border border-gray-200 text-gray-400 flex-shrink-0">
+                              <Package className="w-5 h-5" />
+                            </div>
+                          )}
+                          <p className="font-medium text-gray-900">{p.product_name}</p>
+                        </div>
+                      </td>
                       <td><span className="text-xs font-mono bg-gray-100 px-2 py-0.5 rounded">{p.sku}</span></td>
                       <td><span className="badge badge-info">{p.category}</span></td>
                       <td className="font-medium">{formatCurrency(p.unit_price)}</td>

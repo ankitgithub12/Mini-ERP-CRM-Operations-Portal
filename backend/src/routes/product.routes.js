@@ -1,4 +1,5 @@
 const express = require('express');
+const multer = require('multer');
 const router = express.Router();
 const productController = require('../controllers/product.controller');
 const authenticateUser = require('../middleware/auth');
@@ -10,8 +11,30 @@ const {
   stockMovementSchema,
 } = require('../validators/product.validator');
 
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  }
+});
+
 // All routes require authentication
 router.use(authenticateUser);
+
+// POST /api/products/upload
+router.post(
+  '/upload',
+  authorizeRoles('Admin', 'Warehouse'),
+  upload.single('image'),
+  productController.uploadImage
+);
 
 // GET /api/products
 router.get(

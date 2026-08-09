@@ -9,6 +9,7 @@
     "seed": "node src/seed.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1106.0",
     "@supabase/server": "^1.4.1",
     "@supabase/supabase-js": "^2.45.0",
     "bcryptjs": "^2.4.3",
@@ -18,7 +19,8 @@
     "helmet": "^7.1.0",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "multer": "^2.2.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.4"

@@ -1,4 +1,5 @@
 const productService = require('../services/product.service');
+const s3Service = require('../services/s3.service');
 const { success, created } = require('../utils/apiResponse');
 
 const getProducts = async (req, res, next) => {
@@ -86,6 +87,18 @@ const getAllStockMovements = async (req, res, next) => {
   }
 };
 
+const uploadImage = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'Please upload an image file' });
+    }
+    const imageUrl = await s3Service.uploadFile(req.file);
+    return success(res, 'Image uploaded successfully', { url: imageUrl });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   getProducts,
   getProductById,
@@ -95,4 +108,5 @@ module.exports = {
   stockOut,
   getStockMovements,
   getAllStockMovements,
+  uploadImage,
 };

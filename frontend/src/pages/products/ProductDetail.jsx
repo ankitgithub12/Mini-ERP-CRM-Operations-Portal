@@ -87,10 +87,14 @@ const ProductDetail = () => {
         {/* Product Info */}
         <div className="lg:col-span-1 space-y-4">
           <div className="card card-body">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center">
-                <Package className="w-6 h-6 text-primary-600" />
-              </div>
+            <div className="flex items-center gap-4 mb-4 animate-fade-in">
+              {product.image_url ? (
+                <img src={product.image_url} alt={product.product_name} className="w-16 h-16 object-cover rounded-xl border border-gray-200 shadow-sm bg-gray-50 flex-shrink-0" />
+              ) : (
+                <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center flex-shrink-0">
+                  <Package className="w-6 h-6 text-primary-600" />
+                </div>
+              )}
               <span className="badge badge-info">{product.category}</span>
             </div>
             <div className="space-y-3">

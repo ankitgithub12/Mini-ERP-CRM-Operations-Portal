@@ -5,6 +5,9 @@ export const productService = {
   getById: (id) => api.get(`/products/${id}`),
   create: (data) => api.post('/products', data),
   update: (id, data) => api.put(`/products/${id}`, data),
+  uploadImage: (formData) => api.post('/products/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
   stockIn: (id, data) => api.post(`/products/${id}/stock-in`, data),
   stockOut: (id, data) => api.post(`/products/${id}/stock-out`, data),
   getStockMovements: (id, params) => api.get(`/products/${id}/stock-movements`, { params }),
