@@ -7,9 +7,9 @@ A production-quality full-stack Mini ERP + CRM Operations Portal for wholesale/d
 ### Core Modules
 - **Authentication & RBAC** — JWT-based login with 4 roles (Admin, Sales, Warehouse, Accounts)
 - **Customer CRM** — Full customer management with follow-up tracking
-- **Product & Inventory** — Product catalog with real-time stock management
+- **Product & Inventory** — Product catalog with real-time stock management and **AWS S3 image uploads**
 - **Stock Movements** — Complete audit trail of all inventory changes
-- **Sales Challans** — Draft → Confirm workflow with atomic stock deduction
+- **Sales Challans** — Draft → Confirm workflow with atomic stock deduction and **PDF exports**
 - **Dashboard** — KPI cards, charts, recent activity, and alerts
 
 ### Business Logic
@@ -18,6 +18,8 @@ A production-quality full-stack Mini ERP + CRM Operations Portal for wholesale/d
 - **Insufficient Stock** — Entire confirmation fails with no partial updates
 - **Product Snapshots** — Historical price/name preserved in challan items
 - **Auto Challan Numbers** — `CH-YYYY-NNNN` format, generated server-side
+- **AWS S3 Fallback** — Uploads fallback to high-quality mock product image URLs if S3 keys are not configured in `.env`
+- **Branded PDF Export** — Clients can instantly export and download invoice receipts/delivery challans formatted with standard A4 page layouts
 
 ### Technical Highlights
 - Clean architecture: Routes → Controllers → Services → Database
@@ -41,6 +43,7 @@ A production-quality full-stack Mini ERP + CRM Operations Portal for wholesale/d
 | React Router DOM | Client-side routing |
 | Axios | HTTP client |
 | React Hook Form | Form management |
+| jsPDF & jsPDF-AutoTable | Branded PDF Invoice Generation |
 | Lucide React | Icons |
 | Recharts | Dashboard charts |
 | React Hot Toast | Notifications |
@@ -51,6 +54,8 @@ A production-quality full-stack Mini ERP + CRM Operations Portal for wholesale/d
 | Node.js | Runtime |
 | Express.js | Web framework |
 | JavaScript | Language |
+| AWS SDK (`@aws-sdk/client-s3`) | S3 Image storage uploads |
+| Multer | Multipart file uploading middleware |
 | JWT (jsonwebtoken) | Authentication |
 | bcryptjs | Password hashing |
 | Joi | Request validation |
@@ -214,6 +219,7 @@ GET    /api/products            List (search, filter, paginate)
 GET    /api/products/:id        Get by ID
 POST   /api/products            Create
 PUT    /api/products/:id        Update
+POST   /api/products/upload     Upload product image to S3 (returns public URL)
 POST   /api/products/:id/stock-in     Add stock
 POST   /api/products/:id/stock-out    Remove stock
 GET    /api/products/:id/stock-movements  Movement history
