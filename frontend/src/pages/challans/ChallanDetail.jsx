@@ -8,7 +8,7 @@ import { formatCurrency, formatDate, formatDateTime, getStatusColor, getErrorMes
 import { ArrowLeft, CheckCircle, XCircle, Loader2, Building, Phone, Mail, MapPin, FileText } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 const ChallanDetail = () => {
   const { id } = useParams();
@@ -154,7 +154,7 @@ const ChallanDetail = () => {
         formatPDFCurrency(item.total_price)
       ]);
 
-      doc.autoTable({
+      autoTable(doc, {
         startY: startY,
         head: tableHeaders,
         body: tableData,
