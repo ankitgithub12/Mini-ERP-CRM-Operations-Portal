@@ -312,6 +312,56 @@ The seed script (`npm run seed`) creates:
 
 ---
 
+## 🏛️ Architecture Overview
+
+The system follows a modern full-stack SPA decoupled architecture:
+
+### 1. Backend Architecture (Node.js & Express)
+* **Design Pattern:** Follows the **Controller-Service-Repository** pattern.
+  * **Routes:** Intercepts HTTP requests, validates requests using Joi validation schemas, and enforces Role-Based Access Control (RBAC) via the `authorizeRoles` middleware.
+  * **Controllers:** Handles HTTP status codes and formats standardized JSON API responses.
+  * **Services:** Houses all core business logic (e.g., S3 upload helpers, PDF data processors).
+  * **Database layer:** Communicates with Supabase PostgreSQL using the service-role client.
+* **Security:** Secured using `helmet` headers, CORS protection (restricted to client URLs), and password hashing via `bcryptjs`.
+
+### 2. Frontend Architecture (React 18 & Vite)
+* **State Management:** Simple Context API is used for centralized authentication and session persistence (`AuthContext`).
+* **Router Guards:** Secure client-side routes (`ProtectedRoute`) that conditionally redirect users if they lack the required RBAC privileges.
+* **Form & Validation:** Managed via `react-hook-form` to ensure smooth local input verification and state binding.
+* **Component-driven Design:** Follows a reusable card, modal, and custom uploader layout design.
+
+---
+
+## ⚡ Technical Decisions & Known Limitations
+
+1. **JavaScript vs. TypeScript:**
+   * *Decision:* The template was initiated in ES6 JavaScript. For speed of delivery and to preserve the existing code's integrity within the 48-hour deadline, JavaScript was retained rather than performing a complete project rewrite.
+
+2. **AWS S3 Public Access & Fallback:**
+   * *Decision:* Product images need to be publicly visible in browsers. To achieve this, the S3 bucket must have **Block Public Access: OFF** and a bucket policy set to public-read.
+   * *Fallback:* If S3 credentials (`AWS_ACCESS_KEY_ID`, etc.) are missing from the `.env` file, the backend prints a startup warning and gracefully returns high-quality placeholder image links to ensure the application remains fully functional in local development modes.
+
+3. **Supabase Database Cold Starts:**
+   * *Limitation:* The database is hosted on Supabase's free tier. If the database remains idle, initial queries might face a slight cold-start latency of a few seconds while the PostgreSQL instance spins up.
+
+4. **jsPDF Encoding & Currency Formatting:**
+   * *Limitation:* Standard fonts embedded in `jsPDF` (like Helvetica) do not support Unicode currency signs (such as the Indian Rupee `₹` symbol) and will render them as garbled blocks.
+   * *Decision:* To avoid importing heavy custom TTF fonts into the bundle, prices in the exported PDF are formatted as `INR` strings (e.g., `INR 1,999.00`).
+
+---
+
+## 📋 Assumptions Made
+
+1. **Role Restrictions:**
+   * **Sales** users are assumed to only manage customers, followups, and create challans. They cannot modify stock, trigger stock-in/stock-out, or view stock movement logs.
+   * **Warehouse** users are assumed to manage products and trigger stock movements, but they cannot CRUD customers.
+2. **Sales Challan Confirmation:**
+   * Confirming a Challan is final and immutable. Once stock is deducted and the status transitions from `DRAFT` to `CONFIRMED`, it cannot be reverted back to draft.
+3. **Atomic Stock Decrements:**
+   * If a challan has multiple products, the stock deduction must happen atomically. If any product is short on stock, the entire confirmation fails and rolls back, ensuring stock levels never go negative.
+
+---
+
 ## 📜 License
 
 This project was built as a case study for FundsRoom.
