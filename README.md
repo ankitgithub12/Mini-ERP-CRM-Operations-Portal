@@ -2,6 +2,11 @@
 
 A production-quality full-stack Mini ERP + CRM Operations Portal for wholesale/distribution companies. Manage customers, products, inventory, sales challans, and CRM follow-ups with role-based access control.
 
+## 🔗 Live Demo Links
+
+- **Frontend Application:** [http://54.227.176.149](http://54.227.176.149)
+- **Backend API Base URL:** [http://54.227.176.149:5000/api](http://54.227.176.149:5000/api)
+
 ## 🚀 Features
 
 ### Core Modules
