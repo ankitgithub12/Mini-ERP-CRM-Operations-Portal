@@ -24,12 +24,17 @@ const ProductDetail = () => {
 
   const fetchData = async () => {
     try {
-      const [prodRes, movRes] = await Promise.all([
-        productService.getById(id),
-        productService.getStockMovements(id, { limit: 20 }),
-      ]);
+      const prodRes = await productService.getById(id);
       setProduct(prodRes.data.data);
-      setMovements(movRes.data.data || []);
+      
+      // Fetch movements separately. If 403 Forbidden is returned, handle it gracefully
+      try {
+        const movRes = await productService.getStockMovements(id, { limit: 20 });
+        setMovements(movRes.data.data || []);
+      } catch (movErr) {
+        console.warn('Could not fetch stock movements:', movErr.message);
+        setMovements(null); // Indicates permission error / request failure
+      }
     } catch (err) {
       toast.error('Product not found');
       navigate('/products');
@@ -113,7 +118,12 @@ const ProductDetail = () => {
         <div className="lg:col-span-2">
           <div className="card">
             <div className="card-header"><h3 className="text-base font-semibold text-gray-900">Stock Movement History</h3></div>
-            {movements.length === 0 ? (
+            {movements === null ? (
+              <div className="p-8 text-center text-sm text-amber-600 bg-amber-50 rounded-b-xl flex items-center justify-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-amber-500" />
+                <span>You do not have permission to view stock movement history</span>
+              </div>
+            ) : movements.length === 0 ? (
               <div className="p-8 text-center text-sm text-gray-500">No stock movements recorded</div>
             ) : (
               <div className="divide-y divide-gray-100">
