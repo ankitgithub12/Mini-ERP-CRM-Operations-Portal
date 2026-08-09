@@ -5,7 +5,7 @@ A production-quality full-stack Mini ERP + CRM Operations Portal for wholesale/d
 ## 🚀 Features
 
 ### Core Modules
-- **Authentication & RBAC** — JWT-based login with 4 roles (Admin, Sales, Warehouse, Accounts)
+- **Authentication & RBAC** — JWT-based login with 4 roles (Admin, Sales, Warehouse, Accounts) and **Admin User Management (CRUD)**
 - **Customer CRM** — Full customer management with follow-up tracking
 - **Product & Inventory** — Product catalog with real-time stock management and **AWS S3 image uploads**
 - **Stock Movements** — Complete audit trail of all inventory changes
@@ -245,6 +245,8 @@ GET    /api/dashboard           KPIs, charts, recent activity
 ```
 GET    /api/users               List all users
 POST   /api/users               Create user
+PUT    /api/users/:id           Update user details
+DELETE /api/users/:id           Delete user (with safety relational checks)
 ```
 
 ### API Response Format
@@ -365,6 +367,8 @@ The system follows a modern full-stack SPA decoupled architecture:
    * Confirming a Challan is final and immutable. Once stock is deducted and the status transitions from `DRAFT` to `CONFIRMED`, it cannot be reverted back to draft.
 3. **Atomic Stock Decrements:**
    * If a challan has multiple products, the stock deduction must happen atomically. If any product is short on stock, the entire confirmation fails and rolls back, ensuring stock levels never go negative.
+4. **User Deletion Safety Guards:**
+   * Users who have associated historical transactional items (e.g. created follow-ups, challans, or stock movements) are protected from deletion to preserve referential history integrity. The system intercepts the database cascade error and informs the Admin gracefully.
 
 ---
 
