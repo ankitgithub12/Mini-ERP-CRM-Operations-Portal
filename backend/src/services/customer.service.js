@@ -1,5 +1,6 @@
 const supabase = require('../config/supabase');
 const AppError = require('../utils/AppError');
+const socketService = require('./socket.service');
 
 const getCustomers = async (query) => {
   const { page = 1, limit = 10, search, status, customer_type } = query;
@@ -68,6 +69,13 @@ const createCustomer = async (customerData) => {
     throw new AppError('Failed to create customer', 500);
   }
 
+  // Trigger notification for new customer
+  socketService.sendNotification(
+    ['Admin', 'Sales'],
+    'NEW_LEAD',
+    `New Customer Lead: "${data.customer_name}" has been registered as a ${data.customer_type}.`
+  );
+
   return data;
 };
 
@@ -135,6 +143,18 @@ const createFollowUp = async (customerId, followUpData, userId) => {
     .from('customers')
     .update({ follow_up_date: followUpData.follow_up_date })
     .eq('id', customerId);
+
+  // Trigger notification
+  try {
+    const customer = await getCustomerById(customerId);
+    socketService.sendNotification(
+      ['Admin', 'Sales'],
+      'NEW_FOLLOWUP',
+      `CRM Follow-up scheduled for "${customer.customer_name}" on ${followUpData.follow_up_date}.`
+    );
+  } catch (err) {
+    console.error('Failed to send follow-up socket notification:', err);
+  }
 
   return data;
 };

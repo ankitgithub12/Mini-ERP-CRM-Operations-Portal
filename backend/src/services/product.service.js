@@ -1,5 +1,6 @@
 const supabase = require('../config/supabase');
 const AppError = require('../utils/AppError');
+const socketService = require('./socket.service');
 
 const getProducts = async (query) => {
   const { page = 1, limit = 10, search, category, low_stock } = query;
@@ -167,12 +168,22 @@ const stockOut = async (productId, quantity, reason, userId) => {
   }
 
   // Update stock
+  const newStock = product.current_stock - quantity;
   const { error: updateError } = await supabase
     .from('products')
-    .update({ current_stock: product.current_stock - quantity })
+    .update({ current_stock: newStock })
     .eq('id', productId);
 
   if (updateError) throw new AppError('Failed to update stock', 500);
+
+  // Send real-time notification if stock drops below minimum stock limit
+  if (newStock <= product.minimum_stock) {
+    socketService.sendNotification(
+      ['Admin', 'Warehouse'],
+      'LOW_STOCK',
+      `Low Stock Alert: "${product.product_name}" is down to ${newStock} units (SKU: ${product.sku}).`
+    );
+  }
 
   // Create stock movement
   const { data: movement, error: movementError } = await supabase

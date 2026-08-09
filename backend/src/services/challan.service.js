@@ -1,5 +1,6 @@
 const supabase = require('../config/supabase');
 const AppError = require('../utils/AppError');
+const socketService = require('./socket.service');
 
 const getChallans = async (query) => {
   const { page = 1, limit = 10, search, status, customer_id } = query;
@@ -149,7 +150,13 @@ const createChallan = async (challanData, userId) => {
     throw new AppError('Failed to create challan items', 500);
   }
 
-  return getChallanById(challan.id);
+  const newChallan = await getChallanById(challan.id);
+  socketService.sendNotification(
+    'all',
+    'NEW_CHALLAN',
+    `New Draft Challan created: ${newChallan.challan_number} for customer ${newChallan.customers?.customer_name || 'N/A'}.`
+  );
+  return newChallan;
 };
 
 const updateChallan = async (id, updateData, userId) => {
@@ -261,8 +268,37 @@ const confirmChallan = async (id, userId) => {
     throw new AppError(data.message, 400);
   }
 
-  return getChallanById(id);
-};
+  const confirmedChallan = await getChallanById(id);
+  
+  // Send real-time notification to Accounts, Warehouse and Admin
+  socketService.sendNotification(
+    ['Admin', 'Warehouse', 'Accounts'],
+    'CHALLAN_CONFIRMED',
+    `Challan confirmed: ${confirmedChallan.challan_number} has been confirmed. Stock has been deducted.`
+  );
+
+  // Check and trigger low stock alerts on the deducted items
+  try {
+    for (const item of confirmedChallan.items || []) {
+      const { data: prod } = await supabase
+        .from('products')
+        .select('current_stock, minimum_stock, product_name, sku')
+        .eq('id', item.product_id)
+        .single();
+      if (prod && prod.current_stock <= prod.minimum_stock) {
+        socketService.sendNotification(
+          ['Admin', 'Warehouse'],
+          'LOW_STOCK',
+          `Low Stock Alert: "${prod.product_name}" is down to ${prod.current_stock} units (SKU: ${prod.sku}).`
+        );
+      }
+    }
+  } catch (err) {
+    console.error('Error triggering low stock notifications post challan confirmation:', err);
+  }
+
+  return confirmedChallan;
+}
 
 const cancelChallan = async (id) => {
   const challan = await getChallanById(id);
